@@ -37,28 +37,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-
-data class TipoAlojamiento(val nombre: String, val factor: Double)
-
-val tiposAlojamiento = listOf(
-    TipoAlojamiento("Económico", 0.8),
-    TipoAlojamiento("Estándar", 1.0),
-    TipoAlojamiento("Premium", 1.5)
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pc01_quiliche22200144_perales22200107.data.model.tiposAlojamiento
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BudgetScreen(onBack: () -> Unit) {
-    var dias by remember { mutableStateOf("") }
-    var presupuestoDiario by remember { mutableStateOf("") }
-    var tipoSeleccionado by remember { mutableStateOf(tiposAlojamiento[1]) }
+fun BudgetScreen(
+    onBack: () -> Unit,
+    vm: BudgetViewModel = viewModel()
+) {
     var dropdownExpanded by remember { mutableStateOf(false) }
-
-    var diasError by remember { mutableStateOf("") }
-    var presupuestoError by remember { mutableStateOf("") }
-
-    var resultado by remember { mutableStateOf<Double?>(null) }
-    var mensajeResultado by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -84,39 +72,30 @@ fun BudgetScreen(onBack: () -> Unit) {
 
             Text("Ingresa los datos del viaje", style = MaterialTheme.typography.titleMedium)
 
-            // Campo: Cantidad de días
             OutlinedTextField(
-                value = dias,
-                onValueChange = {
-                    dias = it
-                    diasError = ""
-                },
+                value = vm.dias,
+                onValueChange = vm::onDiasChange,
                 label = { Text("Cantidad de días") },
-                isError = diasError.isNotEmpty(),
-                supportingText = { if (diasError.isNotEmpty()) Text(diasError) },
+                isError = vm.diasError.isNotEmpty(),
+                supportingText = { if (vm.diasError.isNotEmpty()) Text(vm.diasError) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Campo: Presupuesto diario
             OutlinedTextField(
-                value = presupuestoDiario,
-                onValueChange = {
-                    presupuestoDiario = it
-                    presupuestoError = ""
-                },
+                value = vm.presupuestoDiario,
+                onValueChange = vm::onPresupuestoChange,
                 label = { Text("Presupuesto diario (S/)") },
-                isError = presupuestoError.isNotEmpty(),
-                supportingText = { if (presupuestoError.isNotEmpty()) Text(presupuestoError) },
+                isError = vm.presupuestoError.isNotEmpty(),
+                supportingText = { if (vm.presupuestoError.isNotEmpty()) Text(vm.presupuestoError) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Dropdown: Tipo de alojamiento
             Text("Tipo de alojamiento", style = MaterialTheme.typography.bodyMedium)
             Box {
                 OutlinedTextField(
-                    value = "${tipoSeleccionado.nombre} (factor ${tipoSeleccionado.factor})",
+                    value = "${vm.tipoSeleccionado.nombre} (factor ${vm.tipoSeleccionado.factor})",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Alojamiento") },
@@ -135,7 +114,7 @@ fun BudgetScreen(onBack: () -> Unit) {
                         DropdownMenuItem(
                             text = { Text("${tipo.nombre} (×${tipo.factor})") },
                             onClick = {
-                                tipoSeleccionado = tipo
+                                vm.onTipoChange(tipo)
                                 dropdownExpanded = false
                             }
                         )
@@ -145,53 +124,14 @@ fun BudgetScreen(onBack: () -> Unit) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Botón calcular
             Button(
-                onClick = {
-                    var valido = true
-
-                    val diasVal = dias.toIntOrNull()
-                    if (dias.isBlank()) {
-                        diasError = "Campo obligatorio"
-                        valido = false
-                    } else if (diasVal == null) {
-                        diasError = "Ingresa un número entero"
-                        valido = false
-                    } else if (diasVal <= 0) {
-                        diasError = "Debe ser mayor a cero"
-                        valido = false
-                    }
-
-                    val presupuestoVal = presupuestoDiario.toDoubleOrNull()
-                    if (presupuestoDiario.isBlank()) {
-                        presupuestoError = "Campo obligatorio"
-                        valido = false
-                    } else if (presupuestoVal == null) {
-                        presupuestoError = "Ingresa un valor numérico"
-                        valido = false
-                    } else if (presupuestoVal <= 0) {
-                        presupuestoError = "Debe ser mayor a cero"
-                        valido = false
-                    }
-
-                    if (valido) {
-                        val total = diasVal!!.toDouble() * presupuestoDiario.toDouble() * tipoSeleccionado.factor
-                        resultado = total
-                        mensajeResultado = when (tipoSeleccionado.nombre) {
-                            "Económico" -> "Viaje económico de $diasVal días. Presupuesto ajustado con factor 0.8."
-                            "Estándar"  -> "Viaje estándar de $diasVal días. Presupuesto base sin ajuste."
-                            "Premium"   -> "Viaje premium de $diasVal días. Presupuesto incrementado con factor 1.5."
-                            else        -> ""
-                        }
-                    }
-                },
+                onClick = vm::calcular,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Calcular presupuesto")
             }
 
-            // Resultado
-            resultado?.let { total ->
+            vm.resultado?.let { total ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -214,7 +154,7 @@ fun BudgetScreen(onBack: () -> Unit) {
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = mensajeResultado,
+                            text = vm.mensajeResultado,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
