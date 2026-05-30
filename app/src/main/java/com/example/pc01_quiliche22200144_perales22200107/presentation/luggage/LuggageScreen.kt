@@ -96,6 +96,27 @@ fun LuggageScreen(onBack: () -> Unit) {
                 singleLine = true
             )
 
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = "Límites permitidos por aerolínea:",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1565C0)
+                    )
+                    tiposVuelo.forEach { tipo ->
+                        Text(
+                            text = "• ${tipo.nombre}: hasta ${tipo.pesoMaximo} kg",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1976D2)
+                        )
+                    }
+                }
+            }
+
             Text(
                 text = "Tipo de vuelo:",
                 style = MaterialTheme.typography.titleSmall,
