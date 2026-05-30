@@ -1,5 +1,9 @@
 package com.example.pc01_quiliche22200144_perales22200107
 
+// Integrantes del equipo:
+// - Andres Quiliche   (22200144)
+// - Alex Perales      (22200107)
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
