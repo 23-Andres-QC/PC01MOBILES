@@ -123,9 +123,25 @@ fun LuggageScreen(onBack: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    val peso = pesoMaleta.trim()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = {
+                        pesoMaleta = ""
+                        tipoSeleccionado = tiposVuelo[0]
+                        errorPeso = ""
+                        resultado = null
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Limpiar")
+                }
+
+                Button(
+                    onClick = {
+                        val peso = pesoMaleta.trim()
                     when {
                         peso.isEmpty() -> {
                             errorPeso = "El campo es obligatorio"
@@ -162,9 +178,10 @@ fun LuggageScreen(onBack: () -> Unit) {
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Calcular")
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Calcular")
+                }
             }
 
             resultado?.let { res ->
