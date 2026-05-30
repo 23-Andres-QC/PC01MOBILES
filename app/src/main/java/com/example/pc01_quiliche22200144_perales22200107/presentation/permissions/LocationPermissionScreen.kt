@@ -132,6 +132,12 @@ fun LocationPermissionScreen(onBack: () -> Unit) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
                         Text("Solicitar Permiso de Ubicación")
                     }
                 }
@@ -159,6 +165,13 @@ fun LocationPermissionScreen(onBack: () -> Unit) {
                     ) {
                         Text("Intentar nuevamente")
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Si el sistema no muestra el diálogo, ve a Ajustes > Aplicaciones > Permisos",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
